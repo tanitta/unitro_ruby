@@ -140,6 +140,7 @@ class Server
 end
 
 class Client
+	# SDLはClient,Machineのみで使う
 	def initialize(setting)
 		@local_world = World.new(setting)
 		
