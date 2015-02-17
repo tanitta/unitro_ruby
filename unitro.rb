@@ -1,4 +1,10 @@
 module Unitro
+	
+	################################################################
+	#Utility
+	################################################################
+	
+	#Unitroの設定をまとめる
 	class Setting
 		def initialize
 			@matrix_size = {x:10, y:10, z:10}
@@ -6,10 +12,21 @@ module Unitro
 		
 		attr_reader :matrix_size
 	end
-
+	
+	# ?
+	class ServerSetting
+	end
+	
+	# ?
+	class ClientSetting
+	end
+	
+	# 3Dモデルなどのリソースを定義
 	class Resource
 	end
 
+	# Resourceを管理する．
+	# Clientでの描画処理は全てこのクラスを経由して行う
 	class ResourceManager
 		def initialize
 			@resources = {}
@@ -21,28 +38,38 @@ module Unitro
 		def remove_resource
 		end
 		
-		def draw(x,y,z)
+		def draw(name, x, y, z)
 		end
 	end
 
+	# Cellに格納されない動的なオブジェクト
+	# 座標等を定義
 	class BaseEntity
 	end
 
-	class Animal
+	class BaseAnimal < BaseEntity
 	end
 
-	class User
+	class User < BaseEntity
 	end
 
+	################################################################
+	#Matrix
+	################################################################
 	class BaseItem
+		def update
+		end
 	end
 
 	class BasePlant
+		def update
+		end
 	end
 
 	class Parameter
 	end
-
+	
+	# 水
 	class Water < Parameter
 		def initialize
 			@in = 0.0
@@ -54,24 +81,25 @@ module Unitro
 		end
 	end
 
+	# 養分
 	class Nutrition < Parameter
 	end
 
 	class Cell
 		def initialize
 			@parameters = {
-				soil:0.0, #[0,
-				water:0.0, #[0,
-				water_in:0.0, #[0,
-				water_out:0.0, #[0,
-				temp:0.0, 
-				air:0.0,
-				nut_p:0.0,
-				nut_n:0.0,
-				brightness:0.0
+				soil:0.0, # 土 [0,
+				water:0.0, # 水 [0,
+				water_in:0.0, # 土に染み込んでいる水の量 [0,
+				water_out:0.0, # 土に染み込んでいない水の量 [0,
+				temp:0.0, # 温度
+				air:0.0, # 空気
+				nut_p:0.0, # 養分
+				nut_n:0.0, # 養分
+				brightness:0.0 # 明るさ
 			}
 			
-			@plant = BasePlant.new()
+			@plant = BasePlant.new() 
 			@item = BaseItem.new()
 		end
 		
@@ -88,7 +116,12 @@ module Unitro
 		
 		def inspect
 		end
+		
+		def [](index)
+			@matrix[index]
+		end
 	end
+	
 
 	################################################################
 	#World
@@ -111,6 +144,36 @@ module Unitro
 	class WorldController
 		def initialize(world)
 			@world = world
+		end
+	end
+	
+	class Rule
+		def initialize(typeA,typeB,position)
+			@condition
+			@position = position
+			@substance_type
+			@substance_quantity
+		end
+		
+		def condition?(a,b)
+			if a[:water] - b[:water] > 0
+				true
+			end
+		end
+		
+		# def match?(type)
+		# 	#書き換えるtypeのみでマッチング
+		# 	if type == typeA
+		# 		true	
+		# 	elsif type == typeB
+		# 		true
+		# 	else
+		# 		false
+		# 	end
+		# end
+		
+		def generate_cell_rule
+			
 		end
 	end
 
@@ -183,6 +246,31 @@ module Unitro
 		end
 	end
 end
+
+ 
+
+
+class Sketch
+	class Hoge
+		def test
+			size(200,200)
+		end
+	end
+	
+	def setup
+		@setting = Unitro::Setting.new
+		@client = Unitro::Client.new(@setting)
+		@client_machine = Unitro::Machine.new(@client)
+		hoge = Hoge.new
+		hoge.test
+	end
+
+	def draw
+		@client_machine.update
+	end
+end
+
 setting = Unitro::Setting.new
-client = Unitro::Client.new(setting)
-client_machine = Unitro::Machine.new(client)
+
+matrix = Unitro::CellMatrix.new(setting)
+# matrix[0][0][0][:soil]
